@@ -279,7 +279,7 @@ class Algorithm:
         print("No solution found using UCS.")
         return None
     
-    def A_Star(self,heuristic):
+    def A_Star(self):
         print("Running A_Star algorithm...")
         priority_queue = PriorityQueue()
         cost = 0 
@@ -304,16 +304,21 @@ class Algorithm:
                 state_hash = self.board_state_hash(next_board)
                 if state_hash not in visited:
                     visited.add(state_hash)
-                    priority_queue.put((cost + heuristic, id(next_board), next_board, path + [next_board]))
+                    heuristic = self.calculate_heuristic(next_board)
+                    total_cost = cost + 1 + heuristic
+                    priority_queue.put((total_cost + heuristic, id(next_board), next_board, path + [next_board]))
                     next_board.print()
 
         print("No solution found using A_Star.")
         return None
     
-    def calculate_heuristic(self, point):
-        for block in self.blocks:
-            distance = abs(point[0] - block[0]) + abs(point[1]-blocks[1])
-            heuristic = heuristic + distance
+    def calculate_heuristic(self, board):
+        heuristic = 0
+        for box in board.boxs:
+            for point in board.points:
+                distance = abs(point[0] - box[0]) + abs(point[1]-box[1])
+                heuristic = heuristic + distance
+        return heuristic        
 
     def board_state_hash(self, board):
         state_representation = (tuple(board.boxs), tuple(board.points))
@@ -326,17 +331,17 @@ class PlayGame:
     def start(self):
         print("Choose a mode:")
         print("1. User Mode")
-        print("2. Algorithm Mode (BFS/DFS/UCS/a_star)")
+        print("2. Algorithm Mode (BFS/DFS/UCS/A_Star)")
         mode = input("Enter 1 or 2: ").strip()
 
         if mode == '1':
             self.user_mode()
         elif mode == '2':
-            algo_choice = input("Choose an algorithm (bfs/dfs/ucs/a_star): ").strip().lower()
-            if algo_choice in ['bfs', 'dfs', 'ucs','a_star']:
+            algo_choice = input("Choose an algorithm (bfs/dfs/ucs/a*): ").strip().lower()
+            if algo_choice in ['bfs', 'dfs', 'ucs','a*']:
                 self.algorithm_mode(algo_choice)
             else:
-                print("Invalid choice. Please enter 'bfs' or 'dfs' or 'ucs' or 'a_star'.")
+                print("Invalid choice. Please enter 'bfs' or 'dfs' or 'ucs' or 'a*'.")
         else:
             print("Invalid mode selected. Please restart the game and choose again.")    
 
@@ -366,10 +371,10 @@ class PlayGame:
             solution_path = algorithm.dfs()
         elif algorithm_type == 'ucs':
             solution_path = algorithm.ucs()
-        elif algorithm_type == 'a_star':
+        elif algorithm_type == 'a*':
             solution_path = algorithm.A_Star()    
         else:
-            print("Invalid algorithm type. Choose 'bfs' or 'dfs' or 'ucs' or 'A_Star'.")
+            print("Invalid algorithm type. Choose 'bfs' or 'dfs' or 'ucs' or 'A*'.")
             return
 
 # blocks = [(0,0),(0,1),(0,2),(0,3),(0,4),(0,5),(0,6),
